@@ -5,3 +5,5 @@ __pycache__/
 data/
 *.zip
 .DS_Store
+models/
+*.pkl
