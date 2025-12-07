@@ -1,20 +1,21 @@
+
 # Face Recognition System
 
-A **Face Recognition** project using:
+A lightweight and fast **Face Recognition** system built using:
 
-- **MTCNN** for face detection  
-- **FaceNet** (via `keras-facenet`) for generating 512-D face embeddings  
-- **SVM** classifier for identity recognition  
+- **MTCNN** — for face detection  
+- **FaceNet (keras-facenet)** — for generating 512-D embeddings  
+- **SVM Classifier** — for identity prediction  
 
-It supports:
+This project supports:
 
-- Identifying a person from a **single image**
-- Searching for a specific person in a **group photo**
-- **Live webcam** face recognition
+- 🔍 **Single Image Recognition**  
+- 👥 **Person Search in Group Photos**  
+- 🎥 **Real-time Webcam Recognition**
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```text
 Face_Recognition_System/
@@ -39,162 +40,218 @@ Face_Recognition_System/
 │   ├── train_svm.py
 │   └── utils.py
 ├── requirements.txt
-├── README.md
-└── .gitignore
+└── README.md
+````
 
-dataset/train/<person_name>/ — images for each person (used for training).
+### Folder Purposes
 
-dataset/test/*.jpg — images for quick manual testing.
+* **dataset/train/<person_name>/** — training images per identity
+* **dataset/test/** — images for testing/inference
+* **models/** — trained SVM model + label encoder
+* **src/** — all Python source code
 
-models/ — contains the trained SVM model and label encoder.
+---
 
-src/ — all Python source files.
+## 🚀 Installation
 
+It is recommended to use a Python virtual environment.
 
-Installation
-
-It’s recommended to use a virtual environment.
-
+```bash
 cd Face_Recognition_System
 
 python -m venv venv
-# Linux/macOS:
+
+# Linux / macOS:
 source venv/bin/activate
+
 # Windows:
 venv\Scripts\activate
+```
 
+Install dependencies:
+
+```bash
 pip install -r requirements.txt
+```
 
+Ensure the models directory exists:
 
-Make sure models/ exists (you already have it):
-
+```bash
 mkdir -p models
+```
 
-Training
+---
 
-You already have models/label_encoder.pkl and models/svm_model_160x160.pkl.
-Training is optional now, but you can re-train anytime if you change/add data.
+## 🧠 Training the Model
 
-To train (or re-train) the SVM with the current dataset:
+Your repo already includes:
 
+* `models/label_encoder.pkl`
+* `models/svm_model_160x160.pkl`
+
+So **training is optional** unless you modify the dataset.
+
+### Train (or Re-train)
+
+```bash
 python src/train_svm.py --dataset ./dataset/train --models_dir ./models
-
+```
 
 This will:
 
-Load faces from dataset/train/<person_name>/
+1. Load face images from `dataset/train/<person_name>/`
+2. Detect + crop faces using MTCNN
+3. Generate FaceNet embeddings
+4. Train the SVM classifier
+5. Save:
 
-Extract FaceNet embeddings
+   * `models/faces_embeddings.npz`
+   * `models/label_encoder.pkl`
+   * `models/svm_model_160x160.pkl`
 
-Train an SVM classifier
+Train + test accuracy will be printed.
 
-Save:
+---
 
-models/faces_embeddings.npz
+## 🔎 Inference / Usage
 
-models/label_encoder.pkl
+All commands assume you are inside the project root:
 
-models/svm_model_160x160.pkl
-
-You’ll see train and test accuracy printed in the terminal.
-
-Inference / Usage
-
-All commands below assume you are in the project root:
+```
 Face_Recognition_System/
+```
 
-1. Single Image Recognition
+---
 
-Identify the person in a single image:
+### **1️⃣ Single Image Recognition**
 
+```bash
 python src/inference.py --mode single --image ./dataset/test/test1.jpg
+```
 
+✔ Detects the face
+✔ Prints predicted label + confidence
+✔ Displays the image with bounding box & name
 
-Detects the face in test1.jpg
+---
 
-Outputs the predicted label + confidence
+### **2️⃣ Search for a Person in a Group Photo**
 
-Displays the image with a bounding box and predicted name
-
-2. Search a Person in a Group Photo
-
-Check if a particular person (by name) appears in a group photo:
-
+```bash
 python src/inference.py \
   --mode group \
   --image ./dataset/test/test2.jpg \
   --name "lokesh_maheshwari"
+```
 
+**Important:** `--name` **must match exactly** one of the folder names in `dataset/train/`.
 
---name must exactly match one of the folder names in dataset/train/
+Example valid names:
 
-e.g. "jenna_ortega", "taylor_swift", "robert_downey", "sardor_abdirayimov", "lokesh_maheshwari"
+* `jenna_ortega`
+* `taylor_swift`
+* `robert_downey`
+* `sardor_abdirayimov`
+* `lokesh_maheshwari`
 
-If found, the script:
+If the person is found:
 
-Draws a bounding box with the predicted label
+* Bounding box is drawn
+* Terminal prints:
 
-Prints Found lokesh_maheshwari: True
+  ```
+  Found lokesh_maheshwari: True
+  ```
 
-3. Live Webcam Face Recognition
+---
 
-Use your webcam to recognize faces in real-time:
+### **3️⃣ Real-Time Webcam Face Recognition**
 
+```bash
 python src/inference.py --mode live
+```
 
+* Opens webcam
+* Annotates detected faces with labels + confidence
+* Press **q** to exit
 
-Opens a window showing a live video stream
+If needed, change camera index in `inference.py`:
 
-Detected faces are annotated with names + confidence
+```python
+cap = cv2.VideoCapture(1)
+```
 
-Press q to close the window and stop
+---
 
-If your default camera is not working, you can change the camera index inside inference.py:
+## 📦 Requirements
 
-cap = cv2.VideoCapture(1)  # or 2, etc.
+From **requirements.txt**:
 
-Requirements
-
-From requirements.txt (ensure these are included):
-
+```
 opencv-python
 numpy
 matplotlib
 mtcnn
 keras-facenet
 scikit-learn
+```
 
+Optional (for development):
 
-You can add extra dev tools (like jupyter, ipykernel) if you want to experiment in notebooks.
+```
+jupyter
+ipykernel
+```
 
-Notes & Gotchas
+---
 
-Run from project root:
-Always run commands from Face_Recognition_System/ so relative paths (./dataset, ./models) work correctly.
+## ⚠️ Notes & Gotchas
 
-Face detection failures:
-Some images (side profiles, noisy backgrounds, tiny faces) may not yield any detections with MTCNN. Those will either be skipped in training or return “No face found” in inference.
+### ✔ Always run from repo root
 
-First run of FaceNet / MTCNN:
-On the first run, keras-facenet and MTCNN may download model weights. Ensure internet access at least once.
+Relative paths like `./dataset` and `./models` will break otherwise.
 
-Labels:
-Class labels come directly from folder names in dataset/train/.
-Renaming a folder changes the label text used during prediction.
+### ✔ Face Detection May Fail
 
-Possible Improvements / Future Work
+MTCNN may not detect:
 
-Add a confidence threshold to ignore low-confidence predictions (e.g. if conf < 0.6, show “Unknown”).
+* side profiles
+* tiny faces
+* heavy occlusions
+* blurry / low-light images
 
-Add a Gradio web demo where users can upload an image and see predicted labels.
+Such images are skipped during training or return “No face found” during inference.
 
-Expose a FastAPI endpoint for integration with other apps (send image → get JSON result).
+### ✔ First Run Downloads Weights
 
-Log accuracy & confusion matrix for more detailed evaluation.
+`keras-facenet` and MTCNN download pretrained weights on first use. Ensure internet access at least once.
 
-Implement incremental update: add new person without retraining from scratch (by reusing embeddings).
+### ✔ Labels Come From Folder Names
 
-License
+Changing a folder name changes the predicted label.
 
-This project is licensed under the MIT License.
-See the LICENSE file for details.
+Example:
+
+```
+dataset/train/taylor_swift/  → label used: "taylor_swift"
+```
+
+---
+
+## 💡 Future Improvements
+
+* Add **confidence thresholding** (e.g., if conf < 0.60 → “Unknown”)
+* Add a **Gradio UI** for quick demos (upload image → get label)
+* Build a **FastAPI endpoint** (image upload → JSON result)
+* Add evaluation metrics (confusion matrix, precision, recall)
+* Implement **incremental updates** to add identities without full retraining
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
+See the `LICENSE` file for details.
+
+```
+```
