@@ -2,8 +2,8 @@ __pycache__/
 .ipynb_checkpoints/
 .env
 *.pyc
-data/
 *.zip
 .DS_Store
 models/
 *.pkl
+dataset/
