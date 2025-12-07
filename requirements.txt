@@ -1,0 +1,11 @@
+opencv-python
+numpy
+matplotlib
+mtcnn
+keras-facenet
+scikit-learn
+joblib
+flask       # optional, handy for small demos
+fastapi     # optional demo
+uvicorn     # for running FastAPI
+gradio      # optional demo
