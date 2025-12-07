@@ -2,8 +2,6 @@ __pycache__/
 .ipynb_checkpoints/
 .env
 *.pyc
-*.pkl
-/models/
 data/
 *.zip
 .DS_Store
