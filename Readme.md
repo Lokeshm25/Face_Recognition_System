@@ -253,5 +253,3 @@ dataset/train/taylor_swift/  → label used: "taylor_swift"
 This project is licensed under the **MIT License**.
 See the `LICENSE` file for details.
 
-```
-```
